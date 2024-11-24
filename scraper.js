@@ -190,10 +190,7 @@ async function saveToDatabase(registeredRunnersCount) {
 async function main() {
   try {
     console.log("Connecting to the database...");
-    await mongoose.connect(DATABASE_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(DATABASE_STRING);
     console.log("Database connection successful!");
 
     // Start the scraping process
