@@ -1,6 +1,8 @@
-const chromium = require("@sparticuz/chromium");
-const puppeteer = require("puppeteer-core");
+const edgeChromium = require("chrome-aws-lambda");
 
+// Importing Puppeteer core as default otherwise
+// it won't function correctly with "launch()"
+const puppeteer = require("puppeteer-core");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
@@ -8,21 +10,26 @@ const Runner = require("../models/runnersModel");
 dotenv.config({ path: "../.env.local" });
 
 async function scrape() {
+  console.log(puppeteer);
+
   let browser;
+  const LOCAL_CHROME_EXECUTABLE = "/usr/bin/google-chrome";
   try {
+    const executablePath =
+      (await edgeChromium.executablePath) || LOCAL_CHROME_EXECUTABLE;
+
     browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
+      args: edgeChromium.args,
+      executablePath: executablePath,
+      headless: true,
     });
 
     const page = await browser.newPage();
     console.log("Starting the scraping process...");
 
     await page.goto(
-      "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_kolobrzeska_15stka_zaslubin/9626"
+      "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_kolobrzeska_15stka_zaslubin/9626",
+      { timeout: 30000 } // 30 seconds timeout to avoid hanging
     );
 
     await page.waitForSelector("#participants_info");
@@ -30,8 +37,12 @@ async function scrape() {
       el.textContent.trim()
     );
     console.log(registeredRunners);
+
+    // Match the total registered runners using a regular expression
     const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
-    // const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
+    if (!match) {
+      throw new Error("Unable to extract total entries.");
+    }
     const totalEntries = parseInt(match[1], 10);
     console.log(`Scraped data: ${registeredRunners}`);
     console.log(`Scraped registered runners count: ${totalEntries}`);
@@ -65,7 +76,7 @@ async function saveToDatabase(registeredRunnersCount) {
 async function scrapeRegisteredRunners() {
   try {
     await scrape();
-    console.log("scrape successful!");
+    console.log("Scraping successful!");
   } catch (error) {
     console.error("Error in the main process:", error);
   }
