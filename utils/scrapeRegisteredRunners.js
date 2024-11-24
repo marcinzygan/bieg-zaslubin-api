@@ -80,20 +80,22 @@
 
 // module.exports = scrapeRegisteredRunners;
 // const { chromium } = require("playwright-aws-lambda");
-const playwright = require("playwright-aws-lambda");
+const chromium = require("chrome-aws-lambda");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
-// Load environment variables
+// Load environment variables from .env.local
 dotenv.config({ path: "../.env.local" });
 
 async function scrape() {
-  console.log(playwright); // This should log the browser object
-  let browser; // Define the browser variable here to ensure it's accessible in finally block
+  let browser;
   try {
-    browser = await playwright.launchChromium({
+    // Use chrome-aws-lambda's chromium for headless browser
+    browser = await chromium.puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      userDataDir: await chromium.executablePath, // Temporary user data directory
     });
 
     const page = await browser.newPage();
@@ -107,8 +109,9 @@ async function scrape() {
     const registeredRunners = await page.$eval("#participants_info", (el) =>
       el.textContent.trim()
     );
-
-    const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
+    console.log(registeredRunners);
+    const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
+    // const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
     const totalEntries = parseInt(match[1], 10);
     console.log(`Scraped data: ${registeredRunners}`);
     console.log(`Scraped registered runners count: ${totalEntries}`);
@@ -119,9 +122,8 @@ async function scrape() {
   } catch (error) {
     console.error("Error occurred during scraping:", error);
   } finally {
-    // Ensure browser is closed only if it's been launched successfully
     if (browser) {
-      await browser.close();
+      await browser.close(); // Ensure browser is closed after the scrape
     }
   }
 }
