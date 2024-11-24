@@ -1,59 +1,39 @@
-// const puppeteer = require("puppeteer");
-// import chromium from "chrome-aws-lambda";
-// const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
+const chromium = require("@sparticuz/chromium");
+const { chromium: playwrightChromium } = require("playwright-core");
 
 // Load environment variables from .env.local
 dotenv.config({ path: "../.env.local" });
 
-// const DATABASE_STRING = process.env.DATABASE_STRING.replace(
-//   "<PASSWORD>",
-//   process.env.DATABASE_PASSWORD
-// );
-
 // Function to scrape registered runners
 async function scrape() {
-  let chrome = {};
-  let puppeteer;
-
-  if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    // running on the Vercel platform.
-    chrome = require("@sparticuz/chromium");
-    puppeteer = require("puppeteer-core");
-  } else {
-    // running locally.
-    puppeteer = require("puppeteer");
-  }
-  // Launch Puppeteer
-  browser = await puppeteer.launch({
-    args: chrome.args,
-    defaultViewport: chrome.defaultViewport,
-    executablePath: await chrome.executablePath(),
-    headless: chrome.headless,
-    ignoreHTTPSErrors: true,
+  const browser = await playwrightChromium.launch({
+    executablePath: await chromium.executablePath(),
+    args: chromium.args,
+    headless: true,
   });
   const page = await browser.newPage();
 
   try {
     console.log("Starting the scraping process...");
 
-    // Navigate to the target page
+    console.log("Starting the scraping process...");
     await page.goto(
       "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_kolobrzeska_15stka_zaslubin/9626"
     );
-    await page.waitForSelector("#participants_info"); // Wait for the element
-
-    // Scrape the registered runners count
+    await page.waitForSelector("#participants_info");
     const registeredRunners = await page.$eval("#participants_info", (el) =>
       el.textContent.trim()
     );
-    console.log(registeredRunners);
-    const match = registeredRunners.match(/of (\d+) entries/i);
+
+    const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
+    console.log(match, "match");
+
     const totalEntries = parseInt(match[1], 10);
     const registeredRunnersCount = parseInt(totalEntries, 10);
-
-    console.log(`Scraped registered runners count: ${registeredRunnersCount}`);
+    console.log(`Scraped data: ${registeredRunners}`);
+    console.log(`Scraped registered runners count: ${registeredRunners}`);
 
     // Save to MongoDB
     await saveToDatabase(registeredRunnersCount);
