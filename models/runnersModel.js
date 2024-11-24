@@ -11,6 +11,10 @@ const runnerSchema = new mongoose.Schema({
   runnerID: {
     type: Number,
   },
+  lastUpdated: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 const Runner = mongoose.model("Runner", runnerSchema);
 
