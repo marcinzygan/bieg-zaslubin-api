@@ -79,7 +79,8 @@
 // }
 
 // module.exports = scrapeRegisteredRunners;
-const { chromium } = require("playwright-aws-lambda");
+// const { chromium } = require("playwright-aws-lambda");
+const playwright = require("playwright-aws-lambda");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
@@ -87,10 +88,10 @@ const Runner = require("../models/runnersModel");
 dotenv.config({ path: "../.env.local" });
 
 async function scrape() {
+  console.log(playwright); // This should log the browser object
   let browser; // Define the browser variable here to ensure it's accessible in finally block
   try {
-    console.log("Launching Chromium...");
-    browser = await chromium.launch({
+    browser = await playwright.launchChromium({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
