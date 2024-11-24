@@ -1,5 +1,6 @@
 const AppError = require("../utils/AppError");
 const Runner = require("../models/runnersModel");
+const scrapeRegisteredRunners = require("../utils/scrapeRegisteredRunners");
 
 exports.createRunner = async (req, res, next) => {
   try {
@@ -63,6 +64,20 @@ exports.updateRunner = async (req, res, next) => {
       status: "success",
       data: {
         product: foundRunner,
+      },
+    });
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
+};
+
+exports.scrapeRunners = async (req, res, next) => {
+  try {
+    await scrapeRegisteredRunners();
+    res.status(200).json({
+      status: "success",
+      data: {
+        runners: "scraped runners",
       },
     });
   } catch (err) {
