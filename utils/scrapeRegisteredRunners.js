@@ -19,18 +19,19 @@ async function scrape() {
 
   if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
     // running on the Vercel platform.
-    chrome = require("chrome-aws-lambda");
+    chrome = require("@sparticuz/chromium");
     puppeteer = require("puppeteer-core");
   } else {
     // running locally.
     puppeteer = require("puppeteer");
   }
   // Launch Puppeteer
-  const browser = await puppeteer.launch({
-    // args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+  browser = await puppeteer.launch({
+    args: chrome.args,
     defaultViewport: chrome.defaultViewport,
-    executablePath: await chrome.executablePath,
-    headless: true,
+    executablePath: await chrome.executablePath(),
+    headless: chrome.headless,
+    ignoreHTTPSErrors: true,
   });
   const page = await browser.newPage();
 
