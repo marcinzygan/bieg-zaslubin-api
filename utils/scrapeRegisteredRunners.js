@@ -42,12 +42,18 @@ async function scrape() {
     console.log(registeredRunners);
 
     // Match the total registered runners using a regular expression
-    const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
-    // const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
-    if (!match) {
+    const matchEN = registeredRunners.match(/of\s+(\d+)\s+entries/);
+    const matchPL = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
+    if (!matchEN || matchPL) {
       throw new Error("Unable to extract total entries.");
     }
-    const totalEntries = parseInt(match[1], 10);
+    let totalEntries;
+    if (matchEN) {
+      totalEntries = parseInt(matchEN[1], 10);
+    }
+    if (matchPL) {
+      totalEntries = parseInt(matchPL[1], 10);
+    }
     console.log(`Scraped data: ${registeredRunners}`);
     console.log(`Scraped registered runners count: ${totalEntries}`);
 
