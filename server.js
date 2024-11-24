@@ -9,7 +9,7 @@ dotenv.config({ path: "./.env.local" });
 // Handling Uncaught Exceptions
 process.on("uncaughtException", (err) => {
   console.log("💥uncaughtException💥", err);
-  console.log("💥 The APP will shut down .... 💥");
+  console.log("💥 The APP will shut down ... 💥");
 
   process.exit(1);
 });
