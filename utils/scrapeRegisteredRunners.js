@@ -79,29 +79,29 @@
 // }
 
 // module.exports = scrapeRegisteredRunners;
-const { chromium: playwrightChromium } = require("playwright-core");
-const chromium = require("@sparticuz/chromium");
+const { chromium } = require("playwright-aws-lambda");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
-// Load environment variables from .env.local
+// Load environment variables
 dotenv.config({ path: "../.env.local" });
 
 async function scrape() {
-  const executablePath = await chromium.executablePath();
-  console.log("Chromium Executable Path:", executablePath);
-  const browser = await playwrightChromium.launch({
-    executablePath, // Use Chromium's executable path
-    headless: true, // Use Chromium's headless setting
-    args: chromium.args, // Use Chromium's arguments
-  });
-
-  const page = await browser.newPage();
+  let browser; // Define the browser variable here to ensure it's accessible in finally block
   try {
+    console.log("Launching Chromium...");
+    browser = await chromium.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
     console.log("Starting the scraping process...");
+
     await page.goto(
       "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_kolobrzeska_15stka_zaslubin/9626"
     );
+
     await page.waitForSelector("#participants_info");
     const registeredRunners = await page.$eval("#participants_info", (el) =>
       el.textContent.trim()
@@ -118,7 +118,10 @@ async function scrape() {
   } catch (error) {
     console.error("Error occurred during scraping:", error);
   } finally {
-    await browser.close();
+    // Ensure browser is closed only if it's been launched successfully
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
