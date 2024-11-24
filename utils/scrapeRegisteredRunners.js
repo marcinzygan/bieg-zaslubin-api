@@ -55,7 +55,11 @@ async function saveToDatabase(registeredRunnersCount) {
       { registered: registeredRunnersCount, lastUpdated: new Date() },
       { new: true, upsert: true, runValidators: true }
     );
-
+    if (updatedRunner) {
+      console.log("Database updated:", updatedRunner);
+    } else {
+      console.log("Runner update failed.");
+    }
     console.log("Database updated:", updatedRunner);
   } catch (error) {
     console.error("Error saving data to MongoDB:", error);
