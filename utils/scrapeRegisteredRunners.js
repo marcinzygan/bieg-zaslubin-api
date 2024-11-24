@@ -80,7 +80,9 @@
 
 // module.exports = scrapeRegisteredRunners;
 // const { chromium } = require("playwright-aws-lambda");
-const chromium = require("chrome-aws-lambda");
+const chromium = require("@sparticuz/chromium");
+const puppeteer = require("puppeteer-core");
+
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
@@ -90,12 +92,11 @@ dotenv.config({ path: "../.env.local" });
 async function scrape() {
   let browser;
   try {
-    // Use chrome-aws-lambda's chromium for headless browser
-    browser = await chromium.puppeteer.launch({
-      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    browser = await puppeteer.launch({
+      args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless: true,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
       ignoreHTTPSErrors: true,
     });
 
