@@ -1,13 +1,10 @@
 {
   "version": 2,
+
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "memory": 1024,
-        "maxDuration": 10
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -15,15 +12,5 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "functions": {
-    "api/*.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
-  "env": {
-    "CHROMIUM_PATH": "/tmp/chromium",
-    "NODE_ENV": "production"
-  }
+  ]
 }
