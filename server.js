@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const { exec } = require("child_process");
-const fs = require("fs");
 const dotenv = require("dotenv");
 //ENV config
 dotenv.config({ path: "./.env.local" });
