@@ -1,19 +1,37 @@
-const puppeteer = require("puppeteer");
-const mongoose = require("mongoose");
+// const puppeteer = require("puppeteer");
+// import chromium from "chrome-aws-lambda";
+// const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const Runner = require("../models/runnersModel");
 
 // Load environment variables from .env.local
 dotenv.config({ path: "../.env.local" });
 
-const DATABASE_STRING = process.env.DATABASE_STRING.replace(
-  "<PASSWORD>",
-  process.env.DATABASE_PASSWORD
-);
+// const DATABASE_STRING = process.env.DATABASE_STRING.replace(
+//   "<PASSWORD>",
+//   process.env.DATABASE_PASSWORD
+// );
+
 // Function to scrape registered runners
 async function scrape() {
+  let chrome = {};
+  let puppeteer;
+
+  if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    // running on the Vercel platform.
+    chrome = require("chrome-aws-lambda");
+    puppeteer = require("puppeteer-core");
+  } else {
+    // running locally.
+    puppeteer = require("puppeteer");
+  }
   // Launch Puppeteer
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    // args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+    defaultViewport: chrome.defaultViewport,
+    executablePath: await chrome.executablePath,
+    headless: true,
+  });
   const page = await browser.newPage();
 
   try {
@@ -68,12 +86,12 @@ async function saveToDatabase(registeredRunnersCount) {
 // Main function to connect to MongoDB and start the scraper
 async function scrapeRegisteredRunners() {
   try {
-    console.log("Connecting to the database...");
-    await mongoose.connect(DATABASE_STRING);
-    console.log("Database connection successful!");
+    // console.log("Connecting to the database...");
+    // await mongoose.connect(DATABASE_STRING);
 
     // Start the scraping process
     await scrape();
+    console.log("scrape successful!");
   } catch (error) {
     console.error("Error in the main process:", error);
   }
