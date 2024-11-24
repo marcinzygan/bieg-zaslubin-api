@@ -1,5 +1,6 @@
 {
   "version": 2,
+
   "builds": [
     {
       "src": "server.js",
@@ -11,15 +12,5 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ],
-  "env": {
-    "CHROMIUM_BIN": "/tmp/chromium",
-    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/playwright"
-  },
-  "functions": {
-    "server.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  }
+  ]
 }
