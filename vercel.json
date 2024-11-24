@@ -12,5 +12,9 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ]
+  ],
+  "env": {
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/playwright",
+    "CHROMIUM_BIN": "/tmp/playwright/chromium-aws-lambda"
+  }
 }
