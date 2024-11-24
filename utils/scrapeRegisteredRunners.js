@@ -22,6 +22,8 @@ async function scrape() {
         defaultViewport: chrome.defaultViewport,
         executablePath: await chrome.executablePath(),
         headless: chrome.headless,
+        ignoreHTTPSErrors: true, // Ignore SSL errors for faster loading
+        defaultViewport: { width: 1280, height: 800 }, // Specify a fixed viewport
       });
     }
 
