@@ -4,8 +4,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mongoose": "^8.8.2",
-    "puppeteer": "^22.8.2 ",
-    "puppeteer-core": "^22.8.2 "
+    "puppeteer": "^23.9.0 ",
+    "puppeteer-core": "^23.9.0 "
   },
   "engines": {
     "node": "18"
