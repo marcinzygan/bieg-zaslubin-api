@@ -40,8 +40,8 @@ async function scrape() {
     console.log(registeredRunners);
 
     // Match the total registered runners using a regular expression
-    // const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
-    const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
+    const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
+    // const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
     if (!match) {
       throw new Error("Unable to extract total entries.");
     }
