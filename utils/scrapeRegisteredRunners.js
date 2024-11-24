@@ -1,28 +1,29 @@
-const edgeChromium = require("chrome-aws-lambda");
-
-// Importing Puppeteer core as default otherwise
-// it won't function correctly with "launch()"
-const puppeteer = require("puppeteer-core");
-const dotenv = require("dotenv");
+const chrome = require("@sparticuz/chromium");
+const puppeteerCore = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 const Runner = require("../models/runnersModel");
-
+const dotenv = require("dotenv");
 // Load environment variables from .env.local
 dotenv.config({ path: "../.env.local" });
 
 async function scrape() {
-  console.log(puppeteer);
-
   let browser;
-  const LOCAL_CHROME_EXECUTABLE = "/usr/bin/google-chrome";
-  try {
-    const executablePath =
-      (await edgeChromium.executablePath) || LOCAL_CHROME_EXECUTABLE;
 
-    browser = await puppeteer.launch({
-      args: edgeChromium.args,
-      executablePath: executablePath,
-      headless: true,
-    });
+  try {
+    if (process.env.NODE_ENV === "development") {
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: true,
+      });
+    }
+    if (process.env.NODE_ENV === "production") {
+      browser = await puppeteerCore.launch({
+        args: chrome.args,
+        defaultViewport: chrome.defaultViewport,
+        executablePath: await chrome.executablePath(),
+        headless: chrome.headless,
+      });
+    }
 
     const page = await browser.newPage();
     console.log("Starting the scraping process...");
@@ -39,7 +40,8 @@ async function scrape() {
     console.log(registeredRunners);
 
     // Match the total registered runners using a regular expression
-    const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
+    // const match = registeredRunners.match(/of\s+(\d+)\s+entries/);
+    const match = registeredRunners.match(/z\s+(\d+)\s+łącznie/);
     if (!match) {
       throw new Error("Unable to extract total entries.");
     }
