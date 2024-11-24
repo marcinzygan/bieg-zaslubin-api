@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./.env.local" });
 
 // Import the scheduler to run it when the server starts
-require("./scheduler"); // This line will start the scheduled task
+// require("./scheduler"); // This line will start the scheduled task
 
 // Handling Uncaught Exceptions
 process.on("uncaughtException", (err) => {
