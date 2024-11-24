@@ -92,10 +92,11 @@ async function scrape() {
   try {
     // Use chrome-aws-lambda's chromium for headless browser
     browser = await chromium.puppeteer.launch({
-      headless: true,
-      args: chromium.args,
+      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+      defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
-      userDataDir: await chromium.executablePath, // Temporary user data directory
+      headless: true,
+      ignoreHTTPSErrors: true,
     });
 
     const page = await browser.newPage();
