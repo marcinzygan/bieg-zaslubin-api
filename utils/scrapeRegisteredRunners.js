@@ -88,8 +88,9 @@
 // }
 
 // module.exports = scrapeRegisteredRunners;
-const chrome = require("@sparticuz/chromium");
-const puppeteerCore = require("puppeteer-core");
+// utils/scrapeRegisteredRunners.js
+const chromium = require("chrome-aws-lambda");
+const puppeteer = require("puppeteer-core");
 const Runner = require("../models/runnersModel");
 const dotenv = require("dotenv");
 
@@ -100,22 +101,14 @@ async function scrape() {
   let browser;
 
   try {
-    if (process.env.NODE_ENV === "development") {
-      browser = await puppeteerCore.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: true,
-      });
-    }
-
-    if (process.env.NODE_ENV === "production") {
-      browser = await puppeteerCore.launch({
-        args: chrome.args,
-        executablePath: await chrome.executablePath(),
-        headless: chrome.headless,
-        ignoreHTTPSErrors: true,
-      });
-      console.log("Chromium path:", await chrome.executablePath());
-    }
+    // Launch browser
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+      defaultViewport: { width: 1280, height: 800 },
+    });
 
     const page = await browser.newPage();
     console.log("Starting the scraping process...");
@@ -157,7 +150,7 @@ async function saveToDatabase(registeredRunnersCount) {
   try {
     console.log("Starting database update...");
     const updatedRunner = await Runner.findOneAndUpdate(
-      { _id: "6742ea08f778c6c2685744b9" },
+      { _id: "6742ea08f778c6c2685744b9" }, // lub inny Twój dokument
       { registered: registeredRunnersCount, lastUpdated: new Date() },
       { new: true, upsert: true, runValidators: true }
     );
