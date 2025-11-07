@@ -21,10 +21,18 @@ const DB = process.env.DATABASE_STRING.replace(
   "<PASSWORD>",
   process.env.DATABASE_PASSWORD
 );
-mongoose.connect(DB, {}).then(() => {
-  console.log("DB connection sucesfull");
-});
-
+// mongoose.connect(DB, {}).then(() => {
+//   console.log("DB connection sucesfull");
+// });
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000, // 30 sekund
+  })
+  .then(() => {
+    console.log("DB connection successful");
+  });
 const port = process.env.PORT || 8000;
 // APP START
 const server = app.listen(port, () => {
