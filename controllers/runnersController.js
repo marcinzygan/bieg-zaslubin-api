@@ -71,31 +71,31 @@ exports.updateRunner = async (req, res, next) => {
   }
 };
 
-// exports.scrapeRunners = async (req, res, next) => {
-//   try {
-//     await scrapeRegisteredRunners();
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         runners: "scraped runners",
-//       },
-//     });
-//   } catch (err) {
-//     next(new AppError(err.message, 400));
-//   }
-// };
 exports.scrapeRunners = async (req, res, next) => {
   try {
-    // wywołaj scraping w tle, nie czekaj na wynik
-    scrapeRegisteredRunners();
-
-    // od razu zwróć odpowiedź
+    await scrapeRegisteredRunners();
     res.status(200).json({
       status: "success",
-      message: "Scraping started in background",
+      data: {
+        runners: "scraped runners",
+      },
     });
   } catch (err) {
     next(new AppError(err.message, 400));
   }
 };
+// exports.scrapeRunners = async (req, res, next) => {
+//   try {
+//     // wywołaj scraping w tle, nie czekaj na wynik
+//     scrapeRegisteredRunners();
+
+//     // od razu zwróć odpowiedź
+//     res.status(200).json({
+//       status: "success",
+//       message: "Scraping started in background",
+//     });
+//   } catch (err) {
+//     next(new AppError(err.message, 400));
+//   }
+// };
 //
