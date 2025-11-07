@@ -31,8 +31,8 @@ async function scrape() {
     console.log("Starting the scraping process...");
 
     await page.goto(
-      "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_kolobrzeska_15stka_zaslubin/9626",
-      { timeout: 30000 } // 30 seconds timeout to avoid hanging
+      "https://b4sportonline.pl/biegi_kolobrzeg/lista_uczestnikow_21032026__kolobrzeska_15stka_zaslubin/11575",
+      { timeout: 60000 } // 30 seconds timeout to avoid hanging
     );
 
     await page.waitForSelector("#participants_info");
